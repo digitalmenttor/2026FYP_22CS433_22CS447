@@ -332,6 +332,267 @@ These values are reported in the experimental evaluation chapter. :contentRefere
 Future work follows the recommendations presented in Chapter 7. :contentReference[oaicite:8]{index=8}
 
 ---
+# 🎥 Project Demonstration
+
+A complete demonstration of IntelliExam, including system setup, live classroom monitoring, object detection, student behavior analysis, attendance management, and WhatsApp alert generation.
+
+> **Project Demo Video:**  
+> **[Add YouTube / Google Drive Link Here]**
+
+---
+
+# 📸 Project Screenshots
+
+## Dashboard
+
+<p align="center">
+<img src="docs/screenshots/dashboard.png" width="800">
+</p>
+
+---
+
+## Student Attendance
+
+<p align="center">
+<img src="docs/screenshots/attendance.png" width="800">
+</p>
+
+---
+
+## Face Recognition
+
+<p align="center">
+<img src="docs/screenshots/face_recognition.png" width="800">
+</p>
+
+---
+
+## Eye & Head Tracking
+
+<p align="center">
+<img src="docs/screenshots/head_pose.png" width="800">
+</p>
+
+---
+
+## Mobile Phone Detection
+
+<p align="center">
+<img src="docs/screenshots/mobile_detection.png" width="800">
+</p>
+
+---
+
+## Book Detection
+
+<p align="center">
+<img src="docs/screenshots/book_detection.png" width="800">
+</p>
+
+---
+
+## Paper Exchange Detection
+
+<p align="center">
+<img src="docs/screenshots/paper_exchange.png" width="800">
+</p>
+
+---
+
+## WhatsApp Alert
+
+<p align="center">
+<img src="docs/screenshots/whatsapp_alert.png" width="800">
+</p>
+
+---
+
+# 📂 Project Structure
+
+```
+IntelliExam
+│
+├── app.py
+├── main.py
+├── requirements.txt
+├── README.md
+├── .env
+│
+├── src
+│   ├── detection
+│   ├── tracking
+│   ├── notifications
+│   ├── database
+│   ├── middleware
+│   ├── services
+│   └── utils
+│
+├── models
+│
+├── templates
+│
+├── static
+│
+├── videos
+│
+├── logs
+│
+└── docs
+```
+
+---
+
+# 🚀 How IntelliExam Works
+
+```
+Camera Feed
+      │
+      ▼
+Face Recognition
+      │
+      ▼
+Attendance Management
+      │
+      ▼
+Head Pose Estimation
+      │
+      ▼
+Eye Gaze Tracking
+      │
+      ▼
+YOLOv8 Object Detection
+      │
+      ▼
+Risk Score Calculation
+      │
+      ▼
+Dashboard Update
+      │
+      ▼
+WhatsApp Notification
+```
+
+---
+
+# 📊 Performance
+
+| Model | Accuracy |
+|---------|-----------|
+| Face Recognition | 96.2% |
+| Paper Exchange Detection | 97.1% |
+| Head Pose Estimation | 92.8% |
+| Eye Tracking | 90.4% |
+| Calculator Detection | 87.7% |
+| Smart Watch Detection | 83.1% |
+
+---
+
+# ⚡ Main Functionalities
+
+- Automatic Student Attendance
+- Face Recognition
+- Face Verification
+- Unknown Person Detection
+- Eye Tracking
+- Head Pose Tracking
+- Peeking Detection
+- Mobile Phone Detection
+- Calculator Detection
+- Smart Watch Detection
+- Book Detection
+- Paper Exchange Detection
+- Dynamic Risk Score
+- WhatsApp Alert System
+- Live Monitoring Dashboard
+- Detection History
+- CSV Report Export
+
+---
+
+# 📦 Python Libraries
+
+```
+Flask
+OpenCV
+Ultralytics
+MediaPipe
+TensorFlow
+FaceNet
+NumPy
+Pandas
+MySQL Connector
+Twilio
+Flask-SocketIO
+```
+
+Install using
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+# ⚙ Environment Variables
+
+Create a `.env` file.
+
+```env
+MYSQL_HOST=
+MYSQL_USER=
+MYSQL_PASSWORD=
+MYSQL_DATABASE=
+
+TWILIO_ACCOUNT_SID=
+TWILIO_AUTH_TOKEN=
+TWILIO_PHONE_NUMBER=
+
+NGROK_PUBLIC_URL=
+```
+
+---
+
+# 📈 Future Improvements
+
+- Multi-camera support
+- AI-powered exam analytics
+- Cloud deployment
+- Student re-identification
+- Voice activity detection
+- Mobile application
+- Admin dashboard
+- Online examination support
+- AI-generated examination reports
+
+---
+
+# 🎥 Video Demonstration
+
+Full Project Video
+
+
+> **[https://drive.google.com/file/d/1O-oC9vT70ZWYM6Q8nS2OUdNLA3wxcjTH/view?usp=sharing]**
+
+---
+
+# 🤝 Contributors
+
+Muhammad Usman
+
+Hafiz Syed Habib Ahmad Gillani
+
+BS Computer Science
+
+University of Engineering and Technology (RCET)
+
+---
+
+
+
+# ⭐ Support
+
+If you found this project useful, consider giving it a ⭐ on GitHub.
+
 
 # Authors
 
