@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🎥 SmartClass — Monitor</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:#30363d;
+  --text:#e6edf3;--muted:#8b949e;--green:#39d353;--blue:#58a6ff;
+  --yellow:#f0c060;--orange:#ff7b54;--red:#ff4d4f;--purple:#a371f7;
+  --card-r:14px;--shadow:0 4px 24px rgba(0,0,0,.45);--trans:.2s ease;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;gap:1rem}
+.nav-logo{font-size:1.3rem;font-weight:700;background:linear-gradient(135deg,#ff7b54,#58a6ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:.5rem;margin-left:auto}
+.nav-btn{padding:.45rem 1rem;border-radius:8px;border:1px solid var(--border);background:transparent;
+  color:var(--text);cursor:pointer;font-size:.85rem;transition:var(--trans);text-decoration:none;
+  display:inline-flex;align-items:center;gap:.4rem}
+.nav-btn:hover,.nav-btn.active{background:var(--bg3);border-color:var(--blue);color:var(--blue)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;transition:var(--trans)}
+.status-dot.live{background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+main{max-width:1400px;margin:0 auto;padding:1.5rem;display:flex;flex-direction:column;gap:1.5rem}
+
+/* MONITOR GRID */
+.monitor-grid{display:grid;grid-template-columns:1fr 380px;gap:1.5rem}
+@media(max-width:1000px){.monitor-grid{grid-template-columns:1fr}}
+
+/* VIDEO */
+.video-container{background:#000;border:1px solid var(--border);border-radius:var(--card-r);
+  aspect-ratio:16/9;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
+.video-container img{width:100%;height:100%;object-fit:cover}
+.video-placeholder{color:var(--muted);text-align:center}
+.video-placeholder .big{font-size:3rem}
+.video-overlay{position:absolute;top:.75rem;left:.75rem;display:flex;flex-direction:column;gap:.4rem;pointer-events:none}
+.v-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .7rem;border-radius:99px;font-size:.75rem;
+  font-weight:600;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.1)}
+.v-badge.red{border-color:rgba(255,77,79,.6);color:var(--red)}
+.v-badge.green{border-color:rgba(57,211,83,.6);color:var(--green)}
+.v-badge.yellow{border-color:rgba(240,192,96,.6);color:var(--yellow)}
+.v-badge.orange{border-color:rgba(255,123,84,.6);color:var(--orange)}
+
+/* STATS UNDER VIDEO */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.75rem;margin-top:.75rem}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-r);
+  padding:.75rem;text-align:center;transition:var(--trans)}
+.stat-card:hover{transform:translateY(-3px);border-color:var(--blue)}
+.stat-card .icon{font-size:1.3rem;margin-bottom:.2rem}
+.stat-card .value{font-size:1.5rem;font-weight:700;line-height:1}
+.stat-card .label{font-size:.68rem;color:var(--muted);margin-top:.25rem;text-transform:uppercase;letter-spacing:.05em}
+.stat-card.alert{border-color:var(--red);animation:alertBorder 1s infinite}
+@keyframes alertBorder{0%,100%{border-color:var(--red)}50%{border-color:rgba(255,77,79,.3)}}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-r);padding:1.25rem;box-shadow:var(--shadow)}
+.card-title{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);
+  margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.card-title span{font-size:1rem}
+.side-panel{display:flex;flex-direction:column;gap:1rem;max-height:calc(100vh - 140px);overflow-y:auto}
+.side-panel::-webkit-scrollbar{width:3px}
+.side-panel::-webkit-scrollbar-thumb{background:var(--border)}
+
+/* LOG */
+.log-container{max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:.35rem}
+.log-container::-webkit-scrollbar{width:4px}
+.log-container::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.log-entry{font-size:.75rem;padding:.35rem .55rem;border-radius:5px;
+  background:var(--bg3);border-left:3px solid var(--border);line-height:1.4}
+.log-entry.alert{border-left-color:var(--red);background:rgba(255,77,79,.08)}
+.log-entry.warn{border-left-color:var(--yellow);background:rgba(240,192,96,.08)}
+.log-entry.ok{border-left-color:var(--green);background:rgba(57,211,83,.08)}
+
+/* STUDENT ITEMS */
+.student-item{display:flex;align-items:center;gap:.6rem;padding:.6rem;border-radius:8px;
+  background:var(--bg3);border:1px solid var(--border);transition:var(--trans)}
+.student-item:hover{border-color:var(--blue)}
+.student-avatar{width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0}
+.student-info{flex:1;min-width:0}
+.student-name{font-weight:600;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.student-meta{font-size:.7rem;color:var(--muted)}
+.status-pill{padding:.12rem .45rem;border-radius:99px;font-size:.65rem;font-weight:600}
+.pill-green{background:rgba(57,211,83,.15);color:var(--green)}
+.pill-red{background:rgba(255,77,79,.15);color:var(--red)}
+.pill-yellow{background:rgba(240,192,96,.15);color:var(--yellow)}
+
+/* RISK BAR INLINE */
+.risk-mini{display:flex;align-items:center;gap:.4rem;font-size:.7rem}
+.risk-mini-bar{width:60px;height:4px;border-radius:99px;background:var(--bg);overflow:hidden;flex-shrink:0}
+.risk-mini-fill{height:100%;border-radius:99px;transition:.4s ease}
+
+/* BUTTONS */
+.control-row{display:flex;gap:.75rem;flex-wrap:wrap}
+.btn{padding:.6rem 1.25rem;border-radius:8px;border:1px solid var(--border);cursor:pointer;
+  font-size:.85rem;font-weight:600;display:inline-flex;align-items:center;gap:.4rem;transition:var(--trans);text-decoration:none}
+.btn-primary{background:var(--blue);border-color:var(--blue);color:#000}
+.btn-primary:hover{background:#79bdff}
+.btn-danger{background:var(--red);border-color:var(--red);color:#fff}
+.btn-danger:hover{background:#ff7070}
+.btn-ghost{background:transparent;color:var(--text)}
+.btn-ghost:hover{background:var(--bg3)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* TOAST */
+.alert-banner{position:fixed;top:70px;right:1.5rem;z-index:200;display:flex;flex-direction:column;gap:.5rem;max-width:340px}
+.alert-toast{padding:1rem 1.25rem;border-radius:10px;border:1px solid;backdrop-filter:blur(12px);
+  font-size:.85rem;font-weight:600;animation:slideIn .3s ease;box-shadow:var(--shadow);display:flex;align-items:center;gap:.6rem}
+@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast-red{background:rgba(255,77,79,.2);border-color:var(--red);color:#fff}
+.toast-yellow{background:rgba(240,192,96,.2);border-color:var(--yellow);color:#fff}
+.toast-green{background:rgba(57,211,83,.2);border-color:var(--green);color:#fff}
+
+@media(max-width:600px){nav{padding:.6rem 1rem}main{padding:1rem}}
+</style>
+</head>
+<body>
+
+<div class="alert-banner" id="alertBanner"></div>
+
+<nav>
+  <div class="nav-logo">🎓 SmartClass</div>
+  <div class="nav-links">
+    <a class="nav-btn" href="/">📊 Dashboard</a>
+    <a class="nav-btn active" href="/monitor">🎥 Monitor</a>
+    <a class="nav-btn" href="/register">📷 Register</a>
+    <a class="nav-btn" href="/students">👥 Students</a>
+  </div>
+  <span class="status-dot" id="statusDot"></span>
+</nav>
+
+<main>
+
+  <div class="control-row">
+    <button class="btn btn-primary" id="btnStart" onclick="toggleMonitoring()">▶️ Start Monitoring</button>
+    <button class="btn btn-ghost" onclick="exportReport()">📥 Export Report</button>
+  </div>
+
+  <div class="monitor-grid">
+
+    <!-- LEFT: Video + stats -->
+    <div>
+      <div class="video-container">
+        <div class="video-placeholder" id="videoPlaceholder">
+          <div class="big">🎥</div>
+          <p>Click "Start Monitoring" to begin</p>
+        </div>
+        <img id="videoFeed" style="display:none" src="" alt="Live Feed"/>
+        <div class="video-overlay" id="videoOverlay" style="display:none">
+          <div class="v-badge green">🟢 LIVE</div>
+          <div class="v-badge yellow" id="vPeek" style="display:none">👀 PEEKING</div>
+          <div class="v-badge red" id="vYaw" style="display:none">🚨 YAW CHEAT</div>
+          <div class="v-badge red" id="vMobile" style="display:none">📱 DEVICE</div>
+          <div class="v-badge orange" id="vBook" style="display:none">📚 BOOK</div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card"><div class="icon">👥</div><div class="value" id="m-persons">0</div><div class="label">People</div></div>
+        <div class="stat-card"><div class="icon">✅</div><div class="value" id="m-recognized">0</div><div class="label">Reg</div></div>
+        <div class="stat-card"><div class="icon">👀</div><div class="value" id="m-peeking">0</div><div class="label">Peeking</div></div>
+        <div class="stat-card"><div class="icon">🚨</div><div class="value" id="m-yaw">0</div><div class="label">Yaw</div></div>
+        <div class="stat-card"><div class="icon">📱</div><div class="value" id="m-mobile">0</div><div class="label">Devices</div></div>
+        <div class="stat-card"><div class="icon">📄</div><div class="value" id="m-paper">0</div><div class="label">Paper</div></div>
+        <div class="stat-card"><div class="icon">📚</div><div class="value" id="m-books">0</div><div class="label">Books</div></div>
+        <div class="stat-card"><div class="icon">⏱️</div><div class="value" id="m-time">0s</div><div class="label">Time</div></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Side panel -->
+    <div class="side-panel">
+
+      <!-- Live Activity -->
+      <div class="card" style="padding:1rem">
+        <div class="card-title"><span>📝</span> Live Activity</div>
+        <div class="log-container" id="monitorLog">
+          <div class="log-entry ok">Waiting for monitoring...</div>
+        </div>
+      </div>
+
+      <!-- Students + Risk -->
+      <div class="card" style="padding:1rem">
+        <div class="card-title"><span>👤</span> Students — Live Risk</div>
+        <div id="monitorStudents" style="display:flex;flex-direction:column;gap:.4rem">
+          <p style="color:var(--muted);font-size:.82rem">No students registered</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<script>
+let monitoringActive=false;
+
+async function apiGet(path){try{const r=await fetch(path);return await r.json()}catch{return null}}
+async function apiPost(path,body){
+  try{const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})});return await r.json()}
+  catch{return null}
+}
+
+function setText(id,val){const el=document.getElementById(id);if(el)el.textContent=val}
+function setAlert(id,isAlert){
+  const el=document.getElementById(id);if(!el)return;
+  const card=el.closest('.stat-card');if(!card)return;
+  isAlert?card.classList.add('alert'):card.classList.remove('alert')
+}
+
+let lastToastTime={};
+function showToast(msg,type){
+  const now=Date.now();
+  if(lastToastTime[msg]&&(now-lastToastTime[msg])<4000)return;
+  lastToastTime[msg]=now;
+  const banner=document.getElementById('alertBanner');
+  const toast=document.createElement('div');
+  toast.className=`alert-toast toast-${type}`;
+  toast.innerHTML=msg;banner.appendChild(toast);
+  setTimeout(()=>toast.remove(),4000);
+}
+
+function updateLog(containerId,logs){
+  const c=document.getElementById(containerId);if(!c||!logs.length)return;
+  c.innerHTML=[...logs].reverse().map(log=>{
+    let cls='ok';
+    if(log.includes('🚨')||log.includes('ALERT')||log.includes('CHEAT'))cls='alert';
+    else if(log.includes('⚠️')||log.includes('peek')||log.includes('PEEK'))cls='warn';
+    return `<div class="log-entry ${cls}">${log}</div>`;
+  }).join('');
+}
+
+function riskColor(lvl){
+  return lvl==='RED'?'var(--red)':lvl==='YELLOW'?'var(--yellow)':'var(--green)';
+}
+function riskPill(lvl){
+  return `<span class="status-pill pill-${lvl.toLowerCase()}">${lvl}</span>`;
+}
+
+function updateMonitorStudents(students){
+  const c=document.getElementById('monitorStudents');
+  if(!students||!Object.keys(students).length)return;
+  const entries=Object.entries(students);
+  c.innerHTML=entries.map(([id,s])=>{
+    const risk=s.risk_score||0;
+    const lvl=s.risk_level||'GREEN';
+    const rc=riskColor(lvl);
+    let badge='<span class="status-pill pill-green">✅ OK</span>';
+    if(s.yaw_alert)badge='<span class="status-pill pill-red">🚨 Yaw</span>';
+    else if(s.peeking)badge='<span class="status-pill pill-yellow">👀 Peek</span>';
+    else if(s.device_alert)badge='<span class="status-pill pill-red">📱 Device</span>';
+    const reasons=(s.risk_reasons||[]).slice(0,1).join('');
+    return `<div class="student-item">
+      <div class="student-avatar">${s.name.charAt(0).toUpperCase()}</div>
+      <div class="student-info">
+        <div class="student-name">${s.name}</div>
+        <div class="risk-mini">
+          <div class="risk-mini-bar"><div class="risk-mini-fill" style="width:${Math.min(100,risk)}%;background:${rc}"></div></div>
+          <span style="color:${rc};font-weight:700">${Math.round(risk)}</span>
+          ${riskPill(lvl)}
+        </div>
+        ${reasons?`<div class="student-meta" title="${reasons}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${reasons}</div>`:''}
+      </div>
+      ${badge}</div>`;
+  }).join('');
+}
+
+async function toggleMonitoring(){
+  const btn=document.getElementById('btnStart');
+  if(!monitoringActive){
+    btn.disabled=true;btn.textContent='⏳ Starting...';
+    const r=await apiPost('/api/monitoring/start',{});
+    if(r&&r.success){
+      showVideoFeed();
+      btn.textContent='⏹️ Stop Monitoring';btn.className='btn btn-danger';
+      monitoringActive=true;showToast('🎥 Monitoring started!','green');
+    }else{btn.textContent='▶️ Start Monitoring';showToast('❌ Failed to start!','red')}
+    btn.disabled=false;
+  }else{
+    const r=await apiPost('/api/monitoring/stop');
+    if(r&&r.success){
+      hideVideoFeed();btn.textContent='▶️ Start Monitoring';
+      btn.className='btn btn-primary';monitoringActive=false;
+      showToast('⏹️ Monitoring stopped','green');
+    }
+  }
+}
+
+function showVideoFeed(){
+  document.getElementById('videoPlaceholder').style.display='none';
+  const img=document.getElementById('videoFeed');
+  img.src='/api/video_feed?'+Date.now();img.style.display='block';
+  document.getElementById('videoOverlay').style.display='flex';
+}
+function hideVideoFeed(){
+  document.getElementById('videoPlaceholder').style.display='flex';
+  document.getElementById('videoFeed').style.display='none';
+  document.getElementById('videoOverlay').style.display='none';
+}
+
+function exportReport(){window.open('/api/export_report','_blank')}
+
+function setVBadge(id,show){
+  const el=document.getElementById(id);if(el)el.style.display=show?'flex':'none';
+}
+
+async function pollStatus(){
+  const data=await apiGet('/api/stats');if(!data)return;
+  monitoringActive=data.monitoring;
+  const dot=document.getElementById('statusDot');
+  dot.className='status-dot'+(monitoringActive?' live':'');
+  const s=data.stats||{};
+  setText('m-persons',s.person_count||0);setText('m-recognized',s.recognized_count||0);
+  setText('m-peeking',s.peeking_count||0);setText('m-yaw',s.yaw_alert_count||0);
+  setText('m-mobile',s.mobile_count||0);setText('m-paper',s.paper_exchange_count||0);
+  setText('m-books',s.book_count||0);setText('m-time',(s.session_time||0)+'s');
+  setAlert('m-yaw',s.yaw_alert_count>0);setAlert('m-peeking',s.peeking_count>0);
+  setAlert('m-mobile',s.mobile_count>0);setAlert('m-paper',s.paper_exchange_count>0);
+  setAlert('m-books',s.book_count>0);
+  setVBadge('vPeek',s.peeking_count>0);
+  setVBadge('vYaw',s.yaw_alert_count>0);
+  setVBadge('vMobile',s.mobile_count>0);
+  setVBadge('vBook',s.book_count>0);
+  updateLog('monitorLog',data.logs||[]);
+  updateMonitorStudents(data.students||{});
+  if(s.yaw_alert_count>0)showToast('🚨 Yaw Cheating Detected!','red');
+  if(s.peeking_count>0)showToast('👀 Peeking Detected!','yellow');
+  if(s.mobile_count>0)showToast('📱 Prohibited Device Detected!','red');
+  if(s.paper_exchange_count>0)showToast('📄 Paper Exchange Detected!','red');
+  if(s.book_count>0)showToast('📚 Book/Notes Detected!','yellow');
+  const btn=document.getElementById('btnStart');
+  if(monitoringActive&&btn.textContent.includes('Start')){
+    btn.textContent='⏹️ Stop Monitoring';btn.className='btn btn-danger';
+    showVideoFeed();
+  } else if(!monitoringActive&&btn.textContent.includes('Stop')){
+    btn.textContent='▶️ Start Monitoring';btn.className='btn btn-primary';
+    hideVideoFeed();
+  }
+}
+
+(async function init(){
+  const data=await apiGet('/api/stats');
+  if(data&&data.monitoring){monitoringActive=true;showVideoFeed();
+    const btn=document.getElementById('btnStart');
+    btn.textContent='⏹️ Stop Monitoring';btn.className='btn btn-danger'}
+  setInterval(pollStatus,1500);
+})();
+</script>
+</body>
+</html>

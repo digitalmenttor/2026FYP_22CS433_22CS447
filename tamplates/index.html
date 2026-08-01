@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zayqa Restaurant System</title>
+    <style>
+        /* --- CSS STYLING --- */
+        :root {
+            --primary: #ff6b6b;
+            --dark: #2d3436;
+            --light: #f9f9f9;
+        }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background: var(--light); }
+        
+        /* Navigation */
+        nav { background: var(--dark); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        nav h1 { margin: 0; font-size: 24px; }
+        .nav-links button { background: var(--primary); color: white; border: none; padding: 8px 15px; margin-left: 10px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        
+        /* Layout */
+        .container { padding: 20px; max-width: 1200px; margin: auto; }
+        .hidden { display: none; }
+
+        /* Menu Grid */
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+        .card img { width: 100%; height: 150px; object-fit: cover; border-radius: 5px; background: #eee; }
+        .price { color: var(--primary); font-weight: bold; font-size: 18px; margin: 10px 0; }
+        .btn-add { background: #27ae60; color: white; border: none; padding: 8px 15px; cursor: pointer; width: 100%; border-radius: 4px; }
+
+        /* Admin Dashboard */
+        .dashboard-stats { display: flex; gap: 20px; margin-bottom: 20px; }
+        .stat-box { background: white; padding: 20px; flex: 1; border-radius: 8px; border-left: 5px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        
+        table { width: 100%; border-collapse: collapse; background: white; margin-top: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: var(--dark); color: white; }
+        .status-btn { padding: 5px 10px; cursor: pointer; border: none; border-radius: 4px; }
+        .pending { background: #f1c40f; color: black; }
+        .completed { background: #27ae60; color: white; }
+
+        /* Forms */
+        .form-group { margin-bottom: 10px; }
+        input, select { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h1>🍽️ Zayqa Restaurant</h1>
+        <div class="nav-links">
+            <button onclick="showSection('customer')">🏠 Customer Menu</button>
+            <button onclick="showSection('admin')">⚙️ Admin Dashboard</button>
+        </div>
+    </nav>
+
+    <div id="customer-section" class="container">
+        <h2>Menu</h2>
+        <div id="menu-container" class="menu-grid">
+            </div>
+    </div>
+
+    <div id="admin-section" class="container hidden">
+        <h2>Admin Dashboard</h2>
+        
+        <div class="dashboard-stats">
+            <div class="stat-box">
+                <h3>Total Orders</h3>
+                <p id="total-orders-count" style="font-size: 24px; font-weight: bold;">0</p>
+            </div>
+            <div class="stat-box">
+                <h3>Total Revenue</h3>
+                <p id="total-revenue" style="font-size: 24px; font-weight: bold;">Rs. 0</p>
+            </div>
+        </div>
+
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3>➕ Add New Dish</h3>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="newItemName" placeholder="Dish Name (e.g. Biryani)">
+                <input type="number" id="newItemPrice" placeholder="Price (e.g. 350)">
+                <button onclick="addNewItem()" style="background: var(--primary); color: white; border: none; padding: 10px; cursor: pointer;">Add</button>
+            </div>
+        </div>
+
+        <h3>Recent Orders</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="orders-table-body">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        // --- 1. DATA INITIALIZATION ---
+        // Agar pehle se data saved hai to wo uthao, warna default use karo
+        let menuItems = JSON.parse(localStorage.getItem('menuItems')) || [
+            { id: 1, name: 'Chicken Biryani', price: 450 },
+            { id: 2, name: 'Zinger Burger', price: 350 },
+            { id: 3, name: 'Chicken Tikka', price: 200 }
+        ];
+
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+
+        // --- 2. RENDER FUNCTIONS (Dikhana) ---
+
+        // Menu ko Customer side par dikhana
+        function renderMenu() {
+            const container = document.getElementById('menu-container');
+            container.innerHTML = '';
+            menuItems.forEach(item => {
+                container.innerHTML += `
+                    <div class="card">
+                        <div style="height:100px; background:#eee; display:flex; align-items:center; justify-content:center; font-size:30px;">🍲</div>
+                        <h3>${item.name}</h3>
+                        <div class="price">Rs. ${item.price}</div>
+                        <button class="btn-add" onclick="placeOrder('${item.name}', ${item.price})">Order Now</button>
+                    </div>
+                `;
+            });
+        }
+
+        // Orders ko Admin Dashboard par dikhana
+        function renderAdmin() {
+            const tableBody = document.getElementById('orders-table-body');
+            const totalCount = document.getElementById('total-orders-count');
+            const totalRev = document.getElementById('total-revenue');
+            
+            tableBody.innerHTML = '';
+            let revenue = 0;
+
+            orders.forEach((order, index) => {
+                revenue += order.price;
+                const statusClass = order.status === 'Completed' ? 'completed' : 'pending';
+                
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>#${index + 1}</td>
+                        <td>${order.item}</td>
+                        <td>Rs. ${order.price}</td>
+                        <td>${order.time}</td>
+                        <td>
+                            <button class="status-btn ${statusClass}" onclick="toggleStatus(${index})">
+                                ${order.status}
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            totalCount.innerText = orders.length;
+            totalRev.innerText = 'Rs. ' + revenue;
+        }
+
+        // --- 3. ACTIONS (Kaam karna) ---
+
+        // Order Place karna
+        function placeOrder(name, price) {
+            const newOrder = {
+                item: name,
+                price: price,
+                time: new Date().toLocaleTimeString(),
+                status: 'Pending'
+            };
+            orders.unshift(newOrder); // Newest order first
+            saveData();
+            alert(`Order Placed: ${name} for Rs. ${price}`);
+            renderAdmin(); // Admin side update karo background me
+        }
+
+        // Naya khana Menu me add karna (Admin)
+        function addNewItem() {
+            const name = document.getElementById('newItemName').value;
+            const price = Number(document.getElementById('newItemPrice').value);
+
+            if(name && price) {
+                menuItems.push({ id: Date.now(), name, price });
+                saveData();
+                document.getElementById('newItemName').value = '';
+                document.getElementById('newItemPrice').value = '';
+                renderMenu();
+                alert('New Dish Added!');
+            } else {
+                alert('Please enter valid details');
+            }
+        }
+
+        // Order ka Status change karna (Pending <-> Completed)
+        function toggleStatus(index) {
+            if(orders[index].status === 'Pending') {
+                orders[index].status = 'Completed';
+            } else {
+                orders[index].status = 'Pending';
+            }
+            saveData();
+            renderAdmin();
+        }
+
+        // --- 4. UTILITIES ---
+        function saveData() {
+            localStorage.setItem('menuItems', JSON.stringify(menuItems));
+            localStorage.setItem('orders', JSON.stringify(orders));
+        }
+
+        function showSection(section) {
+            if(section === 'customer') {
+                document.getElementById('customer-section').classList.remove('hidden');
+                document.getElementById('admin-section').classList.add('hidden');
+            } else {
+                document.getElementById('customer-section').classList.add('hidden');
+                document.getElementById('admin-section').classList.remove('hidden');
+                renderAdmin(); // Refresh data when opening admin
+            }
+        }
+
+        // Initial Load
+        renderMenu();
+        renderAdmin();
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>📷 SmartClass — Register</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:#30363d;
+  --text:#e6edf3;--muted:#8b949e;--green:#39d353;--blue:#58a6ff;
+  --yellow:#f0c060;--orange:#ff7b54;--red:#ff4d4f;--purple:#a371f7;
+  --card-r:14px;--shadow:0 4px 24px rgba(0,0,0,.45);--trans:.2s ease;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;gap:1rem}
+.nav-logo{font-size:1.3rem;font-weight:700;background:linear-gradient(135deg,#ff7b54,#58a6ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:.5rem;margin-left:auto}
+.nav-btn{padding:.45rem 1rem;border-radius:8px;border:1px solid var(--border);background:transparent;
+  color:var(--text);cursor:pointer;font-size:.85rem;transition:var(--trans);text-decoration:none;
+  display:inline-flex;align-items:center;gap:.4rem}
+.nav-btn:hover,.nav-btn.active{background:var(--bg3);border-color:var(--blue);color:var(--blue)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;transition:var(--trans)}
+.status-dot.live{background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+main{max-width:1100px;margin:0 auto;padding:1.5rem;display:flex;flex-direction:column;gap:1.5rem}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-r);padding:1.25rem;box-shadow:var(--shadow)}
+.card-title{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);
+  margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.card-title span{font-size:1rem}
+
+.reg-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:700px){.reg-grid{grid-template-columns:1fr}}
+
+.reg-preview{background:#000;border:1px solid var(--border);border-radius:var(--card-r);
+  aspect-ratio:4/3;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
+.reg-preview img{width:100%;height:100%;object-fit:cover}
+.face-detected-badge{position:absolute;bottom:.6rem;left:.6rem;padding:.25rem .65rem;
+  border-radius:99px;font-size:.72rem;font-weight:600;background:rgba(57,211,83,.2);
+  border:1px solid rgba(57,211,83,.5);color:var(--green);display:none}
+
+.form-group{margin-bottom:1rem}
+.form-label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:.4rem;font-weight:500}
+.form-input{width:100%;padding:.65rem .9rem;border-radius:8px;border:1px solid var(--border);
+  background:var(--bg3);color:var(--text);font-size:.9rem;transition:var(--trans)}
+.form-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(88,166,255,.15)}
+
+/* PROGRESS */
+.progress-bar{height:8px;background:var(--bg3);border-radius:99px;overflow:hidden;margin:.5rem 0}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));
+  border-radius:99px;transition:.3s ease;width:0%}
+
+/* DOT INDICATORS */
+.sample-dots{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.5rem}
+.sample-dot{width:14px;height:14px;border-radius:50%;border:1px solid var(--border);background:var(--bg3);transition:.2s}
+.sample-dot.filled{background:var(--green);border-color:var(--green);box-shadow:0 0 5px rgba(57,211,83,.5)}
+
+.reg-status{text-align:center;padding:1.25rem;border-radius:10px;
+  background:var(--bg3);border:1px solid var(--border);margin-top:1rem}
+.reg-status .big-icon{font-size:2.5rem;margin-bottom:.5rem}
+
+.tips-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem}
+.tip-item{background:var(--bg3);border-radius:8px;padding:.75rem}
+.tip-icon{font-size:1.2rem;margin-bottom:.25rem}
+.tip-text{font-size:.82rem}
+
+.btn{padding:.6rem 1.25rem;border-radius:8px;border:1px solid var(--border);cursor:pointer;
+  font-size:.85rem;font-weight:600;display:inline-flex;align-items:center;gap:.4rem;transition:var(--trans);text-decoration:none}
+.btn-primary{background:var(--blue);border-color:var(--blue);color:#000}
+.btn-primary:hover{background:#79bdff}
+.btn-ghost{background:transparent;color:var(--text)}
+.btn-ghost:hover{background:var(--bg3)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.alert-banner{position:fixed;top:70px;right:1.5rem;z-index:200;display:flex;flex-direction:column;gap:.5rem;max-width:340px}
+.alert-toast{padding:1rem 1.25rem;border-radius:10px;border:1px solid;backdrop-filter:blur(12px);
+  font-size:.85rem;font-weight:600;animation:slideIn .3s ease;box-shadow:var(--shadow);display:flex;align-items:center;gap:.6rem}
+@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast-red{background:rgba(255,77,79,.2);border-color:var(--red);color:#fff}
+.toast-yellow{background:rgba(240,192,96,.2);border-color:var(--yellow);color:#fff}
+.toast-green{background:rgba(57,211,83,.2);border-color:var(--green);color:#fff}
+
+@media(max-width:600px){nav{padding:.6rem 1rem}main{padding:1rem}}
+</style>
+</head>
+<body>
+
+<div class="alert-banner" id="alertBanner"></div>
+
+<nav>
+  <div class="nav-logo">🎓 SmartClass</div>
+  <div class="nav-links">
+    <a class="nav-btn" href="/">📊 Dashboard</a>
+    <a class="nav-btn" href="/monitor">🎥 Monitor</a>
+    <a class="nav-btn active" href="/register">📷 Register</a>
+    <a class="nav-btn" href="/students">👥 Students</a>
+  </div>
+  <span class="status-dot" id="statusDot"></span>
+</nav>
+
+<main>
+
+  <div class="card">
+    <div class="card-title"><span>📷</span> Register New Student</div>
+    <div class="reg-grid">
+
+      <div>
+        <div class="reg-preview" id="regPreview">
+          <div style="color:var(--muted);text-align:center">
+            <div style="font-size:2.5rem">📷</div>
+            <p style="font-size:.85rem">Camera preview</p>
+          </div>
+          <div class="face-detected-badge" id="faceDetectedBadge">✅ Face Ready</div>
+        </div>
+        <div style="display:flex;gap:.5rem;margin-top:.5rem">
+          <button class="btn btn-ghost" style="flex:1;font-size:.8rem" onclick="refreshPreview()">🔄 Refresh</button>
+          <button class="btn btn-ghost" style="flex:1;font-size:.8rem" onclick="startLivePreview()" id="btnLive">📡 Live Preview</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="form-group">
+          <label class="form-label">Student Full Name</label>
+          <input class="form-input" id="regName" placeholder="e.g. Ali Hassan..." type="text"
+            onkeydown="if(event.key==='Enter')startRegistration()"/>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%" id="btnRegister" onclick="startRegistration()">
+          📸 Capture & Register (10 samples)
+        </button>
+
+        <div class="reg-status" id="regStatus" style="display:none">
+          <div class="big-icon" id="regIcon">⏳</div>
+          <div id="regMessage" style="font-weight:600;margin-bottom:.4rem">Capturing face samples...</div>
+          <div class="progress-bar"><div class="progress-fill" id="regProgress"></div></div>
+          <div id="regCount" style="font-size:.8rem;color:var(--muted);margin-bottom:.5rem">0 / 10 captured</div>
+          <div class="sample-dots" style="justify-content:center" id="sampleDots">
+            ${Array(10).fill(0).map((_,i)=>`<div class="sample-dot" id="dot${i}"></div>`).join('')}
+          </div>
+        </div>
+
+        <div id="regResult" style="display:none;margin-top:.75rem;padding:.75rem;border-radius:8px;border:1px solid var(--border);background:var(--bg3)">
+          <div style="font-size:.85rem" id="regResultText"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>📋</span> Tips for Best Registration Accuracy</div>
+    <div class="tips-grid">
+      <div class="tip-item"><div class="tip-icon">💡</div><div class="tip-text">Good lighting — face camera directly, avoid backlight</div></div>
+      <div class="tip-item"><div class="tip-icon">😊</div><div class="tip-text">Neutral expression — remove glasses if possible</div></div>
+      <div class="tip-item"><div class="tip-icon">📏</div><div class="tip-text">Keep 50–80cm distance from camera</div></div>
+      <div class="tip-item"><div class="tip-icon">🔁</div><div class="tip-text">10 samples captured — more = better recognition</div></div>
+      <div class="tip-item"><div class="tip-icon">🧠</div><div class="tip-text">FaceNet vggface2 — requires ≥90% detection confidence</div></div>
+      <div class="tip-item"><div class="tip-icon">🎯</div><div class="tip-text">Re-register if recognition rate seems low during monitoring</div></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+let liveInterval=null;
+
+async function apiGet(path){try{const r=await fetch(path);return await r.json()}catch{return null}}
+async function apiPost(path,body){
+  try{const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})});return await r.json()}
+  catch{return null}
+}
+
+let lastToastTime={};
+function showToast(msg,type){
+  const now=Date.now();
+  if(lastToastTime[msg]&&(now-lastToastTime[msg])<4000)return;
+  lastToastTime[msg]=now;
+  const banner=document.getElementById('alertBanner');
+  const toast=document.createElement('div');
+  toast.className=`alert-toast toast-${type}`;
+  toast.innerHTML=msg;banner.appendChild(toast);
+  setTimeout(()=>toast.remove(),4000);
+}
+
+function refreshPreview(){
+  stopLivePreview();
+  const preview=document.getElementById('regPreview');
+  preview.innerHTML=`<img src="/api/register/frame?t=${Date.now()}"
+    style="width:100%;height:100%;object-fit:cover"
+    onload="document.getElementById('faceDetectedBadge').style.display='block'"
+    onerror="this.parentElement.innerHTML='<div style=color:var(--muted);text-align:center><div style=font-size:2.5rem>📷</div><p>Camera not accessible</p></div>'"/>
+    <div class='face-detected-badge' id='faceDetectedBadge'>✅ Face Ready</div>`;
+}
+
+function startLivePreview(){
+  if(liveInterval){stopLivePreview();return;}
+  document.getElementById('btnLive').textContent='⏹ Stop Live';
+  liveInterval=setInterval(()=>{
+    const img=document.querySelector('#regPreview img');
+    if(img)img.src='/api/register/frame?t='+Date.now();
+    else refreshPreview();
+  },500);
+}
+function stopLivePreview(){
+  if(liveInterval){clearInterval(liveInterval);liveInterval=null;}
+  document.getElementById('btnLive').textContent='📡 Live Preview';
+}
+
+function updateDots(count){
+  for(let i=0;i<10;i++){
+    const d=document.getElementById('dot'+i);
+    if(d)d.className='sample-dot'+(i<count?' filled':'');
+  }
+}
+
+async function startRegistration(){
+  const name=document.getElementById('regName').value.trim();
+  if(!name){showToast('❌ Please enter a student name!','red');return}
+  stopLivePreview();
+  const btn=document.getElementById('btnRegister');
+  btn.disabled=true;btn.textContent='⏳ Registering...';
+
+  const statusDiv=document.getElementById('regStatus');
+  statusDiv.style.display='block';
+  document.getElementById('regIcon').textContent='⏳';
+  document.getElementById('regMessage').textContent='Capturing face samples...';
+  document.getElementById('regProgress').style.width='0%';
+  document.getElementById('regResult').style.display='none';
+
+  let prog=0;
+  let samplesEst=0;
+  const progInt=setInterval(()=>{
+    prog=Math.min(prog+1.8,88);
+    samplesEst=Math.floor(prog/10);
+    document.getElementById('regProgress').style.width=prog+'%';
+    document.getElementById('regCount').textContent=`~${samplesEst} / 10 captured`;
+    updateDots(samplesEst);
+  },200);
+
+  const r=await apiPost('/api/register',{name});
+  clearInterval(progInt);
+  document.getElementById('regProgress').style.width='100%';
+  updateDots(r?.captured||0);
+  document.getElementById('regCount').textContent=`${r?.captured||0} / 10 samples captured`;
+
+  const resultDiv=document.getElementById('regResult');
+  resultDiv.style.display='block';
+
+  if(r&&r.success){
+    document.getElementById('regIcon').textContent='🎉';
+    document.getElementById('regMessage').textContent=`${name} registered successfully!`;
+    resultDiv.style.borderColor='var(--green)';
+    resultDiv.style.background='rgba(57,211,83,.05)';
+    document.getElementById('regResultText').innerHTML=
+      `<strong style="color:var(--green)">✅ Success</strong> — Student ID: <strong>${r.student_id}</strong> · ${r.captured} samples captured<br>
+       <span style="color:var(--muted);font-size:.8rem">Student is now ready for face recognition during monitoring.</span>`;
+    document.getElementById('regName').value='';
+    showToast(`✅ ${name} registered!`,'green');
+    refreshPreview();
+  }else{
+    document.getElementById('regIcon').textContent='❌';
+    document.getElementById('regMessage').textContent=r?.error||'Registration failed';
+    resultDiv.style.borderColor='var(--red)';
+    resultDiv.style.background='rgba(255,77,79,.05)';
+    document.getElementById('regResultText').innerHTML=
+      `<strong style="color:var(--red)">❌ Failed</strong> — ${r?.error||'Could not capture face. Ensure good lighting and face is visible.'}<br>
+       <span style="color:var(--muted);font-size:.8rem">Try refreshing the preview, adjust lighting, and try again.</span>`;
+    showToast('❌ Registration failed!','red');
+  }
+  btn.disabled=false;btn.textContent='📸 Capture & Register (10 samples)';
+}
+
+async function pollStatus(){
+  const data=await apiGet('/api/stats');if(!data)return;
+  const dot=document.getElementById('statusDot');
+  dot.className='status-dot'+(data.monitoring?' live':'');
+}
+
+window.addEventListener('load',()=>{
+  refreshPreview();
+  setInterval(pollStatus,3000);
+});
+</script>
+</body>
+</html>

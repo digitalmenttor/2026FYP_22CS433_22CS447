@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🎓 SmartClass — Dashboard</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:#30363d;
+  --text:#e6edf3;--muted:#8b949e;--green:#39d353;--blue:#58a6ff;
+  --yellow:#f0c060;--orange:#ff7b54;--red:#ff4d4f;--purple:#a371f7;
+  --card-r:14px;--shadow:0 4px 24px rgba(0,0,0,.45);--trans:.2s ease;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;gap:1rem}
+.nav-logo{font-size:1.3rem;font-weight:700;background:linear-gradient(135deg,#ff7b54,#58a6ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:.5rem;margin-left:auto}
+.nav-btn{padding:.45rem 1rem;border-radius:8px;border:1px solid var(--border);background:transparent;
+  color:var(--text);cursor:pointer;font-size:.85rem;transition:var(--trans);text-decoration:none;
+  display:inline-flex;align-items:center;gap:.4rem}
+.nav-btn:hover,.nav-btn.active{background:var(--bg3);border-color:var(--blue);color:var(--blue)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;transition:var(--trans)}
+.status-dot.live{background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* LAYOUT */
+main{max-width:1400px;margin:0 auto;padding:1.5rem;display:flex;flex-direction:column;gap:1.5rem}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 50%,#1a1f2e 100%);
+  border:1px solid var(--border);border-radius:var(--card-r);padding:2rem;text-align:center;
+  position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 30% 50%,rgba(88,166,255,.08) 0%,transparent 60%),
+             radial-gradient(ellipse at 70% 50%,rgba(163,113,247,.07) 0%,transparent 60%)}
+.hero h1{font-size:clamp(1.5rem,4vw,2.5rem);font-weight:800;
+  background:linear-gradient(135deg,#ff7b54,#f0c060,#58a6ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem}
+.hero p{color:var(--muted);font-size:.95rem}
+.hero-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;margin-top:1rem}
+.badge{padding:.25rem .75rem;border-radius:99px;font-size:.75rem;font-weight:600;border:1px solid}
+.badge-blue{background:rgba(88,166,255,.1);border-color:rgba(88,166,255,.3);color:var(--blue)}
+.badge-green{background:rgba(57,211,83,.1);border-color:rgba(57,211,83,.3);color:var(--green)}
+.badge-orange{background:rgba(255,123,84,.1);border-color:rgba(255,123,84,.3);color:var(--orange)}
+.badge-purple{background:rgba(163,113,247,.1);border-color:rgba(163,113,247,.3);color:var(--purple)}
+.badge-yellow{background:rgba(240,192,96,.1);border-color:rgba(240,192,96,.3);color:var(--yellow)}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-r);padding:1.25rem;box-shadow:var(--shadow)}
+.card-title{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);
+  margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.card-title span{font-size:1rem}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1rem}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-r);
+  padding:1rem;text-align:center;transition:var(--trans);position:relative;overflow:hidden}
+.stat-card:hover{transform:translateY(-3px);border-color:var(--blue)}
+.stat-card .icon{font-size:1.6rem;margin-bottom:.25rem}
+.stat-card .value{font-size:1.8rem;font-weight:700;line-height:1}
+.stat-card .label{font-size:.72rem;color:var(--muted);margin-top:.3rem;text-transform:uppercase;letter-spacing:.05em}
+.stat-card.alert{border-color:var(--red);animation:alertBorder 1s infinite}
+@keyframes alertBorder{0%,100%{border-color:var(--red)}50%{border-color:rgba(255,77,79,.3)}}
+
+/* MODEL STATUS */
+.model-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem}
+.model-item{background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:.75rem;display:flex;align-items:center;gap:.6rem}
+.model-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.model-dot.ok{background:var(--green);box-shadow:0 0 6px var(--green)}
+.model-dot.fail{background:var(--red)}
+.model-name{font-size:.8rem;font-weight:600}
+.model-sub{font-size:.7rem;color:var(--muted)}
+
+/* RISK TABLE */
+.risk-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.risk-table thead tr{color:var(--muted);border-bottom:1px solid var(--border)}
+.risk-table tbody tr{border-bottom:1px solid rgba(255,255,255,.05);transition:var(--trans)}
+.risk-table tbody tr:hover{background:var(--bg3)}
+.risk-table th,.risk-table td{text-align:left;padding:.5rem .6rem}
+.risk-pill{padding:.2rem .55rem;border-radius:99px;font-size:.7rem;font-weight:700}
+.risk-green{background:rgba(57,211,83,.15);color:var(--green)}
+.risk-yellow{background:rgba(240,192,96,.15);color:var(--yellow)}
+.risk-red{background:rgba(255,77,79,.15);color:var(--red)}
+.risk-bar-wrap{display:flex;align-items:center;gap:.5rem}
+.risk-bar{flex:1;height:6px;border-radius:99px;background:var(--bg3);overflow:hidden}
+.risk-bar-fill{height:100%;border-radius:99px;transition:.4s ease}
+
+/* BUTTONS */
+.control-row{display:flex;gap:.75rem;flex-wrap:wrap}
+.btn{padding:.6rem 1.25rem;border-radius:8px;border:1px solid var(--border);
+  cursor:pointer;font-size:.85rem;font-weight:600;display:inline-flex;align-items:center;
+  gap:.4rem;transition:var(--trans);text-decoration:none}
+.btn-primary{background:var(--blue);border-color:var(--blue);color:#000}
+.btn-primary:hover{background:#79bdff}
+.btn-ghost{background:transparent;color:var(--text)}
+.btn-ghost:hover{background:var(--bg3)}
+
+/* LOG */
+.log-container{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:.4rem}
+.log-container::-webkit-scrollbar{width:4px}
+.log-container::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.log-entry{font-size:.78rem;padding:.4rem .6rem;border-radius:6px;
+  background:var(--bg3);border-left:3px solid var(--border);line-height:1.4}
+.log-entry.alert{border-left-color:var(--red);background:rgba(255,77,79,.08)}
+.log-entry.warn{border-left-color:var(--yellow);background:rgba(240,192,96,.08)}
+.log-entry.ok{border-left-color:var(--green);background:rgba(57,211,83,.08)}
+
+/* TOAST */
+.alert-banner{position:fixed;top:70px;right:1.5rem;z-index:200;
+  display:flex;flex-direction:column;gap:.5rem;max-width:340px}
+.alert-toast{padding:1rem 1.25rem;border-radius:10px;border:1px solid;
+  backdrop-filter:blur(12px);font-size:.85rem;font-weight:600;
+  animation:slideIn .3s ease;box-shadow:var(--shadow);display:flex;align-items:center;gap:.6rem}
+@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast-red{background:rgba(255,77,79,.2);border-color:var(--red);color:#fff}
+.toast-yellow{background:rgba(240,192,96,.2);border-color:var(--yellow);color:#fff}
+.toast-green{background:rgba(57,211,83,.2);border-color:var(--green);color:#fff}
+
+@media(max-width:600px){nav{padding:.6rem 1rem}main{padding:1rem}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<div class="alert-banner" id="alertBanner"></div>
+
+<nav>
+  <div class="nav-logo">🎓 SmartClass</div>
+  <div class="nav-links">
+    <a class="nav-btn active" href="/">📊 Dashboard</a>
+    <a class="nav-btn" href="/monitor">🎥 Monitor</a>
+    <a class="nav-btn" href="/register">📷 Register</a>
+    <a class="nav-btn" href="/students">👥 Students</a>
+  </div>
+  <span class="status-dot" id="statusDot"></span>
+</nav>
+
+<main>
+
+  <div class="hero">
+    <h1>Advanced Cheating Detection System</h1>
+    <p>FaceNet · YOLOv8 · MediaPipe · Risk Scoring Engine</p>
+    <div class="hero-badges">
+      <span class="badge badge-blue">🧠 FaceNet Recognition</span>
+      <span class="badge badge-green">👁️ Peeking Detection</span>
+      <span class="badge badge-orange">📄 Paper Exchange</span>
+      <span class="badge badge-purple">📱 Device Detection</span>
+      <span class="badge badge-yellow">📚 Book Detection</span>
+    </div>
+  </div>
+
+  <!-- Model Status -->
+  <div class="card">
+    <div class="card-title"><span>🤖</span> Model Status</div>
+    <div class="model-grid">
+      <div class="model-item"><div class="model-dot" id="dot-facenet"></div><div><div class="model-name">FaceNet</div><div class="model-sub">vggface2</div></div></div>
+      <div class="model-item"><div class="model-dot" id="dot-facedet"></div><div><div class="model-name">Face Det</div><div class="model-sub">OpenCV DNN</div></div></div>
+      <div class="model-item"><div class="model-dot" id="dot-paper"></div><div><div class="model-name">Paper Model</div><div class="model-sub">best.pt</div></div></div>
+      <div class="model-item"><div class="model-dot" id="dot-device"></div><div><div class="model-name">Device Model</div><div class="model-sub">best1.pt</div></div></div>
+      <div class="model-item"><div class="model-dot" id="dot-gpu"></div><div><div class="model-name">Compute</div><div class="model-sub" id="gpuLabel">CPU</div></div></div>
+    </div>
+  </div>
+
+  <!-- Live Stats -->
+  <div class="stats-grid">
+    <div class="stat-card"><div class="icon">👥</div><div class="value" id="s-persons">0</div><div class="label">Detected</div></div>
+    <div class="stat-card"><div class="icon">✅</div><div class="value" id="s-recognized">0</div><div class="label">Recognized</div></div>
+    <div class="stat-card"><div class="icon">✋</div><div class="value" id="s-hands">0</div><div class="label">Hands</div></div>
+    <div class="stat-card"><div class="icon">👀</div><div class="value" id="s-peeking">0</div><div class="label">Peeking</div></div>
+    <div class="stat-card"><div class="icon">🚨</div><div class="value" id="s-yaw">0</div><div class="label">Yaw Alerts</div></div>
+    <div class="stat-card"><div class="icon">📄</div><div class="value" id="s-paper">0</div><div class="label">Paper Exch</div></div>
+    <div class="stat-card"><div class="icon">📱</div><div class="value" id="s-mobile">0</div><div class="label">Devices Now</div></div>
+    <div class="stat-card"><div class="icon">📚</div><div class="value" id="s-books">0</div><div class="label">Books Now</div></div>
+    <div class="stat-card"><div class="icon">⏱️</div><div class="value" id="s-time">0s</div><div class="label">Session</div></div>
+  </div>
+
+  <!-- Risk Scores -->
+  <div class="card">
+    <div class="card-title"><span>⚠️</span> Student Risk Scores</div>
+    <div id="riskTable" style="overflow-x:auto">
+      <p style="color:var(--muted);font-size:.85rem">No students being monitored</p>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="card">
+    <div class="card-title"><span>⚡</span> Quick Actions</div>
+    <div class="control-row">
+      <a class="btn btn-primary" href="/monitor">🎥 Start Monitoring</a>
+      <a class="btn btn-ghost" href="/register">📷 Register Student</a>
+      <a class="btn btn-ghost" href="/students">👥 View Students</a>
+      <a class="btn btn-ghost" href="/api/export_report" target="_blank">📥 Export Report</a>
+    </div>
+  </div>
+
+  <!-- Activity Log -->
+  <div class="card">
+    <div class="card-title"><span>📝</span> Recent Activity</div>
+    <div class="log-container" id="dashLog">
+      <div class="log-entry ok">System ready — waiting for monitoring to start</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+async function apiGet(path){try{const r=await fetch(path);return await r.json()}catch{return null}}
+
+function setText(id,val){const el=document.getElementById(id);if(el)el.textContent=val}
+function setDot(id,ok){const el=document.getElementById(id);if(el)el.className='model-dot '+(ok?'ok':'fail')}
+function setAlert(id,isAlert){
+  const el=document.getElementById(id);if(!el)return;
+  const card=el.closest('.stat-card');if(!card)return;
+  isAlert?card.classList.add('alert'):card.classList.remove('alert')
+}
+
+let lastToastTime={};
+function showToast(msg,type){
+  const now=Date.now();
+  if(lastToastTime[msg]&&(now-lastToastTime[msg])<4000)return;
+  lastToastTime[msg]=now;
+  const banner=document.getElementById('alertBanner');
+  const toast=document.createElement('div');
+  toast.className=`alert-toast toast-${type}`;
+  toast.innerHTML=msg;
+  banner.appendChild(toast);
+  setTimeout(()=>toast.remove(),4000);
+}
+
+function updateLog(containerId,logs){
+  const c=document.getElementById(containerId);if(!c||!logs.length)return;
+  c.innerHTML=[...logs].reverse().map(log=>{
+    let cls='ok';
+    if(log.includes('🚨')||log.includes('ALERT')||log.includes('CHEAT'))cls='alert';
+    else if(log.includes('⚠️')||log.includes('peek')||log.includes('PEEK'))cls='warn';
+    return `<div class="log-entry ${cls}">${log}</div>`;
+  }).join('');
+}
+
+async function loadModelStatus(){
+  const d=await apiGet('/api/status');if(!d)return;
+  setDot('dot-facenet',d.facenet);setDot('dot-facedet',d.face_det);
+  setDot('dot-paper',d.paper_model);setDot('dot-device',d.device_model);setDot('dot-gpu',d.gpu);
+  document.getElementById('gpuLabel').textContent=d.gpu?'CUDA GPU':'CPU';
+}
+
+function renderRiskTable(scores){
+  const c=document.getElementById('riskTable');if(!c)return;
+  if(!scores||!scores.length){
+    c.innerHTML='<p style="color:var(--muted);font-size:.85rem">No data</p>';return;
+  }
+  const rows=scores.map(s=>{
+    const lvl=s.risk_level||'GREEN';
+    const score=s.risk_score||0;
+    const pill=`<span class="risk-pill risk-${lvl.toLowerCase()}">${lvl}</span>`;
+    const barColor=lvl==='RED'?'var(--red)':lvl==='YELLOW'?'var(--yellow)':'var(--green)';
+    const reasons=(s.reasons||[]).join(' · ')||'';
+    return `<tr>
+      <td style="font-weight:600">${s.student_id||'-'}</td>
+      <td>${pill}</td>
+      <td>
+        <div class="risk-bar-wrap">
+          <div class="risk-bar"><div class="risk-bar-fill" style="width:${score}%;background:${barColor}"></div></div>
+          <span style="min-width:32px;font-size:.8rem;font-weight:700">${score.toFixed?score.toFixed(0):score}</span>
+        </div>
+      </td>
+      <td style="color:var(--muted);font-size:.72rem;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${reasons}">${reasons||'—'}</td>
+    </tr>`;
+  }).join('');
+  c.innerHTML=`<table class="risk-table">
+    <thead><tr><th>Student</th><th>Level</th><th>Score</th><th>Reasons</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+async function pollStatus(){
+  const data=await apiGet('/api/stats');if(!data)return;
+  const dot=document.getElementById('statusDot');
+  dot.className='status-dot'+(data.monitoring?' live':'');
+  const s=data.stats||{};
+  setText('s-persons',s.person_count||0);setText('s-recognized',s.recognized_count||0);
+  setText('s-hands',s.hands_detected||0);setText('s-peeking',s.peeking_count||0);
+  setText('s-yaw',s.yaw_alert_count||0);setText('s-paper',s.paper_exchange_count||0);
+  setText('s-mobile',s.mobile_count||0);setText('s-books',s.book_count||0);
+  setText('s-time',(s.session_time||0)+'s');
+  setAlert('s-yaw',s.yaw_alert_count>0);setAlert('s-peeking',s.peeking_count>0);
+  setAlert('s-mobile',s.mobile_count>0);setAlert('s-paper',s.paper_exchange_count>0);
+  setAlert('s-books',s.book_count>0);
+  updateLog('dashLog',data.logs||[]);
+  renderRiskTable(data.risk_summary||[]);
+  if(s.yaw_alert_count>0)showToast('🚨 Yaw Cheating Detected!','red');
+  if(s.peeking_count>0)showToast('👀 Peeking Detected!','yellow');
+  if(s.mobile_count>0)showToast('📱 Prohibited Device Detected!','red');
+  if(s.paper_exchange_count>0)showToast('📄 Paper Exchange Detected!','red');
+  if(s.book_count>0)showToast('📚 Book/Notes Detected!','yellow');
+}
+
+(async function init(){
+  await loadModelStatus();
+  setInterval(pollStatus,1500);
+})();
+</script>
+</body>
+</html>

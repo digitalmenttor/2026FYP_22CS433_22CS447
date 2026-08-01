@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>👥 SmartClass — Students</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:#30363d;
+  --text:#e6edf3;--muted:#8b949e;--green:#39d353;--blue:#58a6ff;
+  --yellow:#f0c060;--orange:#ff7b54;--red:#ff4d4f;--purple:#a371f7;
+  --card-r:14px;--shadow:0 4px 24px rgba(0,0,0,.45);--trans:.2s ease;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;gap:1rem}
+.nav-logo{font-size:1.3rem;font-weight:700;background:linear-gradient(135deg,#ff7b54,#58a6ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:.5rem;margin-left:auto}
+.nav-btn{padding:.45rem 1rem;border-radius:8px;border:1px solid var(--border);background:transparent;
+  color:var(--text);cursor:pointer;font-size:.85rem;transition:var(--trans);text-decoration:none;
+  display:inline-flex;align-items:center;gap:.4rem}
+.nav-btn:hover,.nav-btn.active{background:var(--bg3);border-color:var(--blue);color:var(--blue)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;transition:var(--trans)}
+.status-dot.live{background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+main{max-width:1400px;margin:0 auto;padding:1.5rem;display:flex;flex-direction:column;gap:1.5rem}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-r);padding:1.25rem;box-shadow:var(--shadow)}
+.card-title{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);
+  margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.card-title span{font-size:1rem}
+
+/* STUDENT LIST */
+.student-item{display:flex;align-items:center;gap:.75rem;padding:.75rem;border-radius:8px;
+  background:var(--bg3);border:1px solid var(--border);transition:var(--trans)}
+.student-item:hover{border-color:var(--blue)}
+.student-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0}
+.student-info{flex:1;min-width:0}
+.student-name{font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.student-meta{font-size:.75rem;color:var(--muted);margin-top:.1rem}
+.student-actions{display:flex;gap:.4rem;align-items:center}
+.btn-icon{width:30px;height:30px;border-radius:6px;border:1px solid var(--border);
+  background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;
+  justify-content:center;font-size:.85rem;transition:var(--trans)}
+.btn-icon:hover{background:rgba(255,77,79,.15);color:var(--red);border-color:var(--red)}
+.btn-icon.view:hover{background:rgba(88,166,255,.15);color:var(--blue);border-color:var(--blue)}
+
+/* PILLS */
+.status-pill{padding:.15rem .5rem;border-radius:99px;font-size:.68rem;font-weight:600}
+.pill-green{background:rgba(57,211,83,.15);color:var(--green)}
+.pill-red{background:rgba(255,77,79,.15);color:var(--red)}
+.pill-yellow{background:rgba(240,192,96,.15);color:var(--yellow)}
+.pill-orange{background:rgba(255,123,84,.15);color:var(--orange)}
+.badge{padding:.25rem .75rem;border-radius:99px;font-size:.75rem;font-weight:600;border:1px solid}
+.badge-orange{background:rgba(255,123,84,.1);border-color:rgba(255,123,84,.3);color:var(--orange)}
+.badge-blue{background:rgba(88,166,255,.1);border-color:rgba(88,166,255,.3);color:var(--blue)}
+.badge-red{background:rgba(255,77,79,.1);border-color:rgba(255,77,79,.3);color:var(--red)}
+.badge-green{background:rgba(57,211,83,.1);border-color:rgba(57,211,83,.3);color:var(--green)}
+.badge-purple{background:rgba(163,113,247,.1);border-color:rgba(163,113,247,.3);color:var(--purple)}
+
+/* BUTTONS */
+.btn{padding:.6rem 1.25rem;border-radius:8px;border:1px solid var(--border);cursor:pointer;
+  font-size:.85rem;font-weight:600;display:inline-flex;align-items:center;gap:.4rem;transition:var(--trans);text-decoration:none}
+.btn-ghost{background:transparent;color:var(--text)}
+.btn-ghost:hover{background:var(--bg3)}
+.btn-danger{background:var(--red);border-color:var(--red);color:#fff}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+thead tr{color:var(--muted);border-bottom:1px solid var(--border)}
+tbody tr{border-bottom:1px solid rgba(255,255,255,.05);transition:var(--trans)}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+th,td{text-align:left;padding:.55rem .5rem}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);
+  backdrop-filter:blur(8px);overflow-y:auto;padding:2rem}
+.modal-box{max-width:780px;margin:0 auto;background:var(--bg2);border:1px solid var(--border);
+  border-radius:16px;padding:1.5rem}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+
+/* RISK INLINE */
+.risk-bar-wrap{display:flex;align-items:center;gap:.4rem}
+.risk-bar{width:70px;height:5px;border-radius:99px;background:var(--bg3);overflow:hidden;flex-shrink:0}
+.risk-bar-fill{height:100%;border-radius:99px}
+
+/* ENGAGEMENT BAR */
+.eng-bar{flex:1;background:var(--bg3);border-radius:99px;height:7px;overflow:hidden}
+.eng-fill{height:100%;border-radius:99px}
+
+/* TOAST */
+.alert-banner{position:fixed;top:70px;right:1.5rem;z-index:400;display:flex;flex-direction:column;gap:.5rem;max-width:340px}
+.alert-toast{padding:1rem 1.25rem;border-radius:10px;border:1px solid;backdrop-filter:blur(12px);
+  font-size:.85rem;font-weight:600;animation:slideIn .3s ease;box-shadow:var(--shadow);display:flex;align-items:center;gap:.6rem}
+@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast-red{background:rgba(255,77,79,.2);border-color:var(--red);color:#fff}
+.toast-yellow{background:rgba(240,192,96,.2);border-color:var(--yellow);color:#fff}
+.toast-green{background:rgba(57,211,83,.2);border-color:var(--green);color:#fff}
+
+/* TABS */
+.tabs{display:flex;gap:.25rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+.tab-btn{padding:.4rem .9rem;border-radius:8px 8px 0 0;border:none;background:transparent;
+  color:var(--muted);cursor:pointer;font-size:.82rem;font-weight:600;transition:var(--trans)}
+.tab-btn.active{background:var(--bg3);color:var(--text);border-bottom:2px solid var(--blue)}
+
+@media(max-width:600px){nav{padding:.6rem 1rem}main{padding:1rem}}
+</style>
+</head>
+<body>
+
+<div class="alert-banner" id="alertBanner"></div>
+
+<!-- Student Detail Modal -->
+<div class="modal-bg" id="studentModal" onclick="closeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h2 id="modalTitle" style="font-size:1.2rem">Student Detail</h2>
+      <button class="btn btn-ghost" style="padding:.35rem .75rem" onclick="document.getElementById('studentModal').style.display='none'">✕ Close</button>
+    </div>
+    <div id="modalBody">Loading...</div>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-logo">🎓 SmartClass</div>
+  <div class="nav-links">
+    <a class="nav-btn" href="/">📊 Dashboard</a>
+    <a class="nav-btn" href="/monitor">🎥 Monitor</a>
+    <a class="nav-btn" href="/register">📷 Register</a>
+    <a class="nav-btn active" href="/students">👥 Students</a>
+  </div>
+  <span class="status-dot" id="statusDot"></span>
+</nav>
+
+<main>
+
+  <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">
+    <button class="btn btn-ghost" onclick="loadStudents()">🔄 Refresh</button>
+    <span id="studentsCount" style="color:var(--muted);font-size:.85rem"></span>
+  </div>
+
+  <!-- Students -->
+  <div class="card">
+    <div class="card-title"><span>👥</span> Registered Students</div>
+    <div id="studentsList" style="display:flex;flex-direction:column;gap:.75rem">
+      <p style="color:var(--muted)">Loading...</p>
+    </div>
+  </div>
+
+  <!-- Sessions -->
+  <div class="card">
+    <div class="card-title"><span>📅</span> Recent Sessions</div>
+    <div id="sessionsList" style="overflow-x:auto">
+      <p style="color:var(--muted);font-size:.85rem">Loading...</p>
+    </div>
+  </div>
+
+</main>
+
+<script>
+async function apiGet(path){try{const r=await fetch(path);return await r.json()}catch{return null}}
+
+let lastToastTime={};
+function showToast(msg,type){
+  const now=Date.now();
+  if(lastToastTime[msg]&&(now-lastToastTime[msg])<4000)return;
+  lastToastTime[msg]=now;
+  const banner=document.getElementById('alertBanner');
+  const toast=document.createElement('div');
+  toast.className=`alert-toast toast-${type}`;
+  toast.innerHTML=msg;banner.appendChild(toast);
+  setTimeout(()=>toast.remove(),4000);
+}
+
+function strToColor(str){
+  let h=0;for(let i=0;i<str.length;i++)h=str.charCodeAt(i)+((h<<5)-h);
+  const hue=Math.abs(h)%360;
+  return `hsl(${hue},55%,38%), hsl(${(hue+50)%360},55%,28%)`;
+}
+
+function riskColor(lvl){return lvl==='RED'?'var(--red)':lvl==='YELLOW'?'var(--yellow)':'var(--green)';}
+
+async function loadStudents(){
+  const data=await apiGet('/api/students');
+  const c=document.getElementById('studentsList');
+  const students=data?.students||[];
+
+  if(!students.length){
+    c.innerHTML='<p style="color:var(--muted)">No students registered yet. <a href="/register" style="color:var(--blue)">Register one →</a></p>';
+    return;
+  }
+
+  const countEl=document.getElementById('studentsCount');
+  if(countEl)countEl.textContent=`${students.length} student${students.length!==1?'s':''} registered`;
+
+  // Also get live risk scores
+  const riskData=await apiGet('/api/risk_scores');
+  const riskDetail=riskData?.detail||{};
+
+  c.innerHTML=students.map(s=>{
+    const risk=riskDetail[s.id]||{};
+    const riskScore=risk.risk_score||0;
+    const riskLvl=risk.risk_level||'GREEN';
+    const rc=riskColor(riskLvl);
+    const hasAlerts=s.total_alerts>0;
+    return `<div class="student-item">
+      <div class="student-avatar" style="background:linear-gradient(135deg,${strToColor(s.name)})">
+        ${s.name.charAt(0).toUpperCase()}
+      </div>
+      <div class="student-info">
+        <div class="student-name">${s.name}</div>
+        <div class="student-meta">
+          ID: ${s.id}
+          ${s.registered_at?'· Reg: '+s.registered_at.split(' ')[0]:''}
+          · Sessions: ${s.sessions_attended||0}
+          · Alerts: <strong style="color:${hasAlerts?'var(--red)':'var(--muted)'}">${s.total_alerts||0}</strong>
+          ${s.avg_engagement?'· Eng: '+s.avg_engagement+'%':''}
+        </div>
+        ${riskScore>0?`<div style="display:flex;align-items:center;gap:.4rem;margin-top:.2rem">
+          <div class="risk-bar"><div class="risk-bar-fill" style="width:${Math.min(100,riskScore)}%;background:${rc}"></div></div>
+          <span style="font-size:.7rem;font-weight:700;color:${rc}">${riskScore.toFixed(0)} ${riskLvl}</span>
+          ${(risk.reasons||[]).slice(0,1).map(r=>`<span style="font-size:.68rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;max-width:200px;white-space:nowrap">${r}</span>`).join('')}
+        </div>`:''}
+      </div>
+      <div class="student-actions">
+        ${hasAlerts
+          ?`<span class="status-pill pill-red">🚨 ${s.total_alerts}</span>`
+          :`<span class="status-pill pill-green">✅ Clean</span>`}
+        <button class="btn-icon view" onclick="showStudentDetail(${s.id},'${s.name.replace(/'/g,"\\'")}')" title="View Detail">👁️</button>
+        <button class="btn-icon" onclick="deleteStudent(${s.id},'${s.name.replace(/'/g,"\\'")}')" title="Delete">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  loadSessions();
+}
+
+async function showStudentDetail(id,name){
+  document.getElementById('studentModal').style.display='block';
+  document.getElementById('modalTitle').textContent=`👤 ${name}`;
+  document.getElementById('modalBody').innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">⏳ Loading...</div>';
+
+  const data=await apiGet(`/api/students/${id}/detail`);
+  if(!data||data.error){
+    document.getElementById('modalBody').innerHTML=`<p style="color:var(--red)">${data?.error||'Failed to load'}</p>`;return;
+  }
+
+  const s=data.student||{};
+  const ev=data.cheating_events||[];
+  const eng=data.engagement||[];
+  const al=data.alert_summary||{};
+  const engAvg=eng.length?(eng.reduce((a,e)=>a+e.engagement_score,0)/eng.length).toFixed(1):'N/A';
+
+  // Event type color map
+  const evColorMap={yaw:'badge-orange',mobile:'badge-red',peeking:'badge-blue',paper_exchange:'badge-orange',book:'badge-purple'};
+
+  document.getElementById('modalBody').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+      <div class="card" style="margin:0">
+        <div class="card-title"><span>ℹ️</span> Info</div>
+        <div style="font-size:.85rem;display:flex;flex-direction:column;gap:.4rem">
+          <div><span style="color:var(--muted)">ID:</span> <strong>${s.id}</strong></div>
+          <div><span style="color:var(--muted)">Registered:</span> ${s.registered_at||'-'}</div>
+          <div><span style="color:var(--muted)">Sessions Attended:</span> <strong>${data.sessions_attended||0}</strong></div>
+          <div><span style="color:var(--muted)">Avg Engagement:</span>
+            <strong style="color:${engAvg>70?'var(--green)':engAvg>40?'var(--yellow)':'var(--red)'}">${engAvg}%</strong></div>
+          <div><span style="color:var(--muted)">Total Alerts:</span>
+            <strong style="color:var(--red)">${s.total_alerts||0}</strong></div>
+        </div>
+      </div>
+      <div class="card" style="margin:0">
+        <div class="card-title"><span>📊</span> Alert Breakdown</div>
+        <div style="font-size:.85rem;display:flex;flex-direction:column;gap:.35rem">
+          ${Object.entries(al).length?Object.entries(al).map(([k,v])=>`
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span class="badge ${evColorMap[k]||'badge-blue'}" style="padding:.15rem .5rem">${k}</span>
+              <span class="status-pill pill-red">${v}×</span>
+            </div>`).join(''):'<span style="color:var(--muted)">No alerts recorded</span>'}
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin:0 0 1rem">
+      <div class="card-title"><span>🚨</span> Cheating Events (last 50)</div>
+      ${ev.length?`
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Time</th><th>Type</th><th>Severity</th><th>Direction/Device</th></tr></thead>
+          <tbody>
+            ${ev.map(e=>`<tr>
+              <td style="color:var(--muted)">${e.occurred_at}</td>
+              <td><span class="badge ${evColorMap[e.event_type]||'badge-blue'}">${e.event_type}</span></td>
+              <td><span class="status-pill ${e.severity==='HIGH'?'pill-red':'pill-yellow'}">${e.severity}</span></td>
+              <td style="color:var(--muted)">${e.direction||e.device_class||(e.paper_from?'P'+e.paper_from+'→P'+e.paper_to:'-')}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`:'<p style="color:var(--muted);font-size:.85rem">No cheating events recorded ✅</p>'}
+    </div>
+
+    <div class="card" style="margin:0">
+      <div class="card-title"><span>📈</span> Engagement History</div>
+      ${eng.length?`
+        <div style="display:flex;flex-direction:column;gap:.45rem">
+          ${eng.map(e=>`
+            <div style="display:flex;align-items:center;gap:.75rem;font-size:.8rem">
+              <span style="color:var(--muted);min-width:150px">${e.recorded_at}</span>
+              <div class="eng-bar">
+                <div class="eng-fill" style="width:${e.engagement_score}%;background:${e.engagement_score>70?'var(--green)':e.engagement_score>40?'var(--yellow)':'var(--red)'}"></div>
+              </div>
+              <span style="min-width:45px;text-align:right;font-weight:600">${e.engagement_score?.toFixed(1)}%</span>
+            </div>`).join('')}
+        </div>`:'<p style="color:var(--muted);font-size:.85rem">No engagement data yet</p>'}
+    </div>`;
+}
+
+function closeModal(e){
+  if(e.target.id==='studentModal')document.getElementById('studentModal').style.display='none';
+}
+
+async function loadSessions(){
+  const data=await apiGet('/api/sessions');
+  const c=document.getElementById('sessionsList');if(!c)return;
+  const sessions=data?.sessions||[];
+  if(!sessions.length){c.innerHTML='<p style="color:var(--muted);font-size:.85rem">No sessions recorded yet</p>';return}
+  c.innerHTML=`
+    <table>
+      <thead><tr>
+        <th>ID</th><th>Started</th><th>Duration</th>
+        <th style="text-align:center">Students</th>
+        <th style="text-align:center">Yaw</th>
+        <th style="text-align:center">Peek</th>
+        <th style="text-align:center">Mobile</th>
+        <th style="text-align:center">Paper</th>
+        <th>Export</th>
+      </tr></thead>
+      <tbody>
+        ${sessions.map(s=>`<tr>
+          <td style="color:var(--muted)">#${s.id}</td>
+          <td>${s.started_at||'-'}</td>
+          <td style="color:var(--muted)">${s.duration_sec?s.duration_sec+'s':'-'}</td>
+          <td style="text-align:center">${s.students_present||0}</td>
+          <td style="text-align:center;color:${s.total_yaw_alerts>0?'var(--red)':'var(--muted)'}">${s.total_yaw_alerts||0}</td>
+          <td style="text-align:center;color:${s.total_peeking_alerts>0?'var(--yellow)':'var(--muted)'}">${s.total_peeking_alerts||0}</td>
+          <td style="text-align:center;color:${s.total_mobile_alerts>0?'var(--red)':'var(--muted)'}">${s.total_mobile_alerts||0}</td>
+          <td style="text-align:center;color:${s.total_paper_exchanges>0?'var(--orange)':'var(--muted)'}">${s.total_paper_exchanges||0}</td>
+          <td><a href="/api/export_report/${s.id}" class="btn btn-ghost" style="padding:.3rem .6rem;font-size:.75rem">⬇️ CSV</a></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+async function deleteStudent(id,name){
+  if(!confirm(`Delete "${name}"? This will remove them from the database.`))return;
+  const r=await fetch(`/api/students/${id}`,{method:'DELETE'});
+  const data=await r.json();
+  if(data.success){showToast(`🗑️ ${name} deleted`,'yellow');loadStudents();}
+  else showToast(`❌ Delete failed: ${data.error}`,'red');
+}
+
+async function pollStatus(){
+  const data=await apiGet('/api/stats');if(!data)return;
+  const dot=document.getElementById('statusDot');
+  dot.className='status-dot'+(data.monitoring?' live':'');
+}
+
+window.addEventListener('load',()=>{
+  loadStudents();
+  setInterval(pollStatus,3000);
+});
+</script>
+</body>
+</html>
