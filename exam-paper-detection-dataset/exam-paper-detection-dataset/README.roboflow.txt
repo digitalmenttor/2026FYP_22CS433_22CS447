@@ -1,6 +1,6 @@
 
 exam-paper-detection - v2 2026-02-11 11:05pm
-==============================
+===============================
 
 This dataset was exported via roboflow.com on February 11, 2026 at 6:55 PM GMT
 
