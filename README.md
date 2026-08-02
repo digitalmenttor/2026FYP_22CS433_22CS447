@@ -4,6 +4,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
 ![Flask](https://img.shields.io/badge/Flask-2.x-black)
+![React](https://img.shields.io/badge/React-Vite-61DAFB)
 ![YOLOv8](https://img.shields.io/badge/YOLO-v8-green)
 ![FaceNet](https://img.shields.io/badge/FaceNet-Recognition-orange)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-blue)
@@ -26,7 +27,7 @@ IntelliExam is an AI-powered examination monitoring system developed to improve 
 
 The system combines multiple Artificial Intelligence and Computer Vision technologies to automatically identify students, monitor their behaviour, detect suspicious activities, calculate cheating risk scores, and notify instructors in real time.
 
-Unlike conventional examination monitoring systems that rely heavily on manual invigilation or CCTV recordings, IntelliExam performs continuous automated monitoring using live video streams and generates evidence-based alerts whenever suspicious behaviour is detected. :contentReference[oaicite:0]{index=0} :contentReference[oaicite:1]{index=1}
+Unlike conventional examination monitoring systems that rely heavily on manual invigilation or CCTV recordings, IntelliExam performs continuous automated monitoring using live video streams and generates evidence-based alerts whenever suspicious behaviour is detected.
 
 ---
 
@@ -61,7 +62,7 @@ YOLOv8 detects:
 - Notes
 - Paper Exchange
 
-The paper exchange detector is trained on a custom dataset developed specifically for this project because no public dataset provides this class. :contentReference[oaicite:2]{index=2}
+The paper exchange detector is trained on a custom dataset developed specifically for this project because no public dataset provides this class.
 
 ---
 
@@ -88,7 +89,7 @@ When the predefined risk threshold is exceeded, IntelliExam automatically sends:
 - Timestamp
 - Snapshot evidence
 
-through the Twilio WhatsApp API. :contentReference[oaicite:3]{index=3}
+through the Twilio WhatsApp API.
 
 ---
 
@@ -109,7 +110,7 @@ Real-time dashboard includes:
 
 | Layer | Technology |
 |---------|------------|
-| Frontend | HTML5, CSS3, Bootstrap 5, JavaScript |
+| Frontend | React (Vite) |
 | Backend | Flask |
 | Language | Python 3.10 |
 | Database | MySQL 8 |
@@ -122,7 +123,7 @@ Real-time dashboard includes:
 | Dataset Annotation | Roboflow, LabelImg |
 | Training | Google Colab |
 
-Technology stack follows the implementation described in Chapter 5 of the thesis. :contentReference[oaicite:4]{index=4}
+Technology stack follows the implementation described in Chapter 5 of the thesis.
 
 ---
 
@@ -168,7 +169,7 @@ Risk Scoring Engine
 Database
       │
       ▼
-Dashboard
+Dashboard (React Frontend)
       │
       ▼
 WhatsApp Alerts
@@ -252,11 +253,13 @@ Real-time WhatsApp alerts with image evidence.
 | /api/export_report | GET | Export CSV report |
 | /api/classrooms | GET/POST | Classroom management |
 
-Based on the Flask API described in the thesis. :contentReference[oaicite:5]{index=5}
+Based on the Flask API described in the thesis.
 
 ---
 
 # Installation
+
+## Backend Setup
 
 Clone the repository
 
@@ -267,6 +270,7 @@ git clone https://github.com/yourusername/IntelliExam.git
 Install dependencies
 
 ```bash
+cd IntelliExam
 pip install -r requirements.txt
 ```
 
@@ -285,11 +289,82 @@ TWILIO_PHONE_NUMBER=
 NGROK_PUBLIC_URL=
 ```
 
-Run
+Run the backend server
 
 ```bash
 python app.py
 ```
+
+Backend will run on `http://localhost:5000` by default.
+
+---
+
+## Frontend Setup
+
+The frontend is a **React + Vite** application located inside the `Frontend/` folder.
+
+**Frontend folder structure:**
+
+```
+Frontend
+│
+├── src
+├── index.html
+├── package.json
+├── package-lock.json
+├── vite.config.js
+└── README.md
+```
+
+### Steps to run the frontend
+
+1. Navigate to the Frontend folder
+
+```bash
+cd Frontend
+```
+
+2. Install dependencies
+
+```bash
+npm install
+```
+
+3. Configure the backend API URL (if required)
+
+Create a `.env` file inside `Frontend/` and add:
+
+```env
+VITE_API_BASE_URL=http://localhost:5000
+```
+
+4. Start the development server
+
+```bash
+npm run dev
+```
+
+By default, Vite will serve the frontend at:
+
+```
+http://localhost:5173
+```
+
+5. Build for production (optional)
+
+```bash
+npm run build
+```
+
+This generates an optimized production build inside the `dist/` folder, which can be served via any static hosting or integrated with the Flask backend.
+
+6. Preview the production build (optional)
+
+```bash
+npm run preview
+```
+
+> **Note:** Make sure the Flask backend (`python app.py`) is running before starting the frontend, since the dashboard fetches live data (video feed, risk scores, attendance, activity logs) from the backend REST API.
 
 ---
 
@@ -301,7 +376,7 @@ python app.py
 - Webcam
 - Windows 11
 
-The evaluation environment described in the thesis used this configuration. :contentReference[oaicite:6]{index=6}
+The evaluation environment described in the thesis used this configuration.
 
 ---
 
@@ -314,7 +389,7 @@ The evaluation environment described in the thesis used this configuration. :con
 - Automatic Attendance
 - Evidence-based Risk Assessment
 
-These values are reported in the experimental evaluation chapter. :contentReference[oaicite:7]{index=7}
+These values are reported in the experimental evaluation chapter.
 
 ---
 
@@ -329,7 +404,7 @@ These values are reported in the experimental evaluation chapter. :contentRefere
 - Enhanced dashboard
 - Expanded paper exchange dataset
 
-Future work follows the recommendations presented in Chapter 7. :contentReference[oaicite:8]{index=8}
+Future work follows the recommendations presented in Chapter 7.
 
 ---
 
@@ -363,7 +438,15 @@ IntelliExam
 │
 ├── logs
 │
-└── docs
+├── docs
+│
+└── Frontend
+    ├── src
+    ├── index.html
+    ├── package.json
+    ├── package-lock.json
+    ├── vite.config.js
+    └── README.md
 ```
 
 ---
@@ -392,7 +475,7 @@ YOLOv8 Object Detection
 Risk Score Calculation
       │
       ▼
-Dashboard Update
+Dashboard Update (React Frontend)
       │
       ▼
 WhatsApp Notification
@@ -435,7 +518,7 @@ WhatsApp Notification
 
 ---
 
-# 📦 Python Libraries
+# 📦 Backend Python Libraries
 
 ```
 Flask
@@ -459,9 +542,22 @@ pip install -r requirements.txt
 
 ---
 
+# 📦 Frontend Dependencies
+
+Frontend dependencies are managed via `npm` and listed in `Frontend/package.json`. Install using
+
+```bash
+cd Frontend
+npm install
+```
+
+---
+
 # ⚙ Environment Variables
 
-Create a `.env` file.
+## Backend `.env`
+
+Create a `.env` file in the project root.
 
 ```env
 MYSQL_HOST=
@@ -474,6 +570,14 @@ TWILIO_AUTH_TOKEN=
 TWILIO_PHONE_NUMBER=
 
 NGROK_PUBLIC_URL=
+```
+
+## Frontend `.env`
+
+Create a `.env` file inside `Frontend/`.
+
+```env
+VITE_API_BASE_URL=http://localhost:5000
 ```
 
 ---
@@ -496,7 +600,6 @@ NGROK_PUBLIC_URL=
 
 Full Project Video
 
-
 > **[https://drive.google.com/file/d/1O-oC9vT70ZWYM6Q8nS2OUdNLA3wxcjTH/view?usp=sharing]**
 
 ---
@@ -513,12 +616,9 @@ University of Engineering and Technology (RCET)
 
 ---
 
-
-
 # ⭐ Support
 
 If you found this project useful, consider giving it a ⭐ on GitHub.
-
 
 # Authors
 
@@ -534,11 +634,11 @@ RCET, UET Lahore
 
 # Supervisor
 
-**Ma’am Amna Wajid**
+**Ma'am Amna Wajid**
 
 Co-Supervisor
 
-**Ma’am Namra Ashraf**
+**Ma'am Namra Ashraf**
 
 ---
 
